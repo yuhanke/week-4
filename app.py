@@ -44,20 +44,24 @@ def getData():
 	lng2 = str(request.args.get('lng2'))
 
 	print "received coordinates: [" + lat1 + ", " + lat2 + "], [" + lng1 + ", " + lng2 + "]"
+
+	q.put('receiving coordinates')	
 	
 	client = pyorient.OrientDB("localhost", 2424)
-	session_id = client.connect("root", "password")
-	db_name = "property_test"
+	session_id = client.connect("root", "123456")
+	db_name = "soufun"
 	db_username = "admin"
 	db_password = "admin"
 
 	if client.db_exists( db_name, pyorient.STORAGE_TYPE_MEMORY ):
 		client.db_open( db_name, db_username, db_password )
 		print db_name + " opened successfully"
+		q.put('database was opened successfully')
 	else:
 		print "database [" + db_name + "] does not exist! session ending..."
 		sys.exit()
-
+		q.put('fail.........')
+		
 	query = 'SELECT FROM Listing WHERE latitude BETWEEN {} AND {} AND longitude BETWEEN {} AND {}'
 
 	records = client.command(query.format(lat1, lat2, lng1, lng2))
